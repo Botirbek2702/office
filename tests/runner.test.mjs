@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+process.env.NODE_ENV='test';
+const {startRun,getRun,retryRun}=await import('../codex-runner.mjs');
+const plan={title:'Test',summary:'Test flow',questions:[],tasks:[{id:'one',owner:'backend',title:'Implement',deliverable:'file',acceptance:['works'],depends_on:[]},{id:'two',owner:'qa',title:'Check',deliverable:'checks',acceptance:['passes'],depends_on:['one']}]};
+const passed={status:'passed',summary:'Checked',files:[],checks:['node --test: 1 passed'],limitations:[]};
+async function wait(id){for(let i=0;i<100;i++){const run=await getRun(id);if(!['running','planning'].includes(run.status))return run;await new Promise(r=>setTimeout(r,10));}throw new Error('timeout');}
+test('dependency order, final QA gate, persistence and retry',async()=>{const order=[];const run=await startRun('mock test',{agentCall:async({name})=>{order.push(name);return name==='manager'?structuredClone(plan):structuredClone(passed);}});const complete=await wait(run.id);assert.equal(complete.status,'completed');assert.deepEqual(order,['manager','task-0','task-1','final-qa']);const failed=await startRun('mock failure',{agentCall:async({name})=>name==='manager'?structuredClone(plan):{...passed,status:'failed'}});const result=await wait(failed.id);assert.equal(result.status,'failed');assert.equal(result.tasks[1].status,'pending');const retried=[];await retryRun(failed.id,{agentCall:async({name})=>{retried.push(name);return structuredClone(passed);}});assert.equal((await wait(failed.id)).status,'completed');assert.deepEqual(retried,['task-0','task-1','final-qa']);});

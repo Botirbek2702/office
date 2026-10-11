@@ -3,3 +3,6 @@
 
 #agent-dialog{max-height:85vh;overflow:auto;max-width:620px}.plan-task{border-top:1px solid var(--line);padding:15px 0}.plan-task h3{font-size:14px}.plan-task li{font-size:12px;line-height:1.8;color:#687560}.task-row .quiet-button{white-space:nowrap;font-size:9px}.header-right{flex-wrap:wrap}@media(max-width:600px){header{height:auto;min-height:70px;gap:8px;padding:10px 0}.header-right{justify-content:flex-end}.task-row{flex-wrap:wrap}}
 
+
+.artifact-button{display:block;border:1px solid var(--line);border-radius:6px;background:#edf1e5;padding:8px 12px;margin:7px 0;font-size:11px}.run-log{margin:15px 0;font-size:12px}.run-log p{overflow-wrap:anywhere}
+
